@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev_v2.db"
+}
+
+model User {
+  id                  String    @id @default(uuid())
+  username            String    @unique
+  password            String
+  phone               String?   @unique
+  recoveryCodeHash    String?
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+  role                String    @default("USER")
+  status              String    @default("ACTIVE")
+  lastLoginAt         DateTime?
+  lastLoginIp         String?
+  lastActiveAt        DateTime?
+  province            String?
+  city                String?
+  school              String?
+  createdAt           DateTime  @default(now())
+  projects            Project[]
+  loginLogs           LoginLog[]
+}
+
+model LoginLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ip        String
+  userAgent String?
+  status    String   @default("SUCCESS")
+  createdAt DateTime @default(now())
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  storagePath String
+  entryFile   String
+  size        Int      @default(0) // Size in bytes
+  visitCount  Int      @default(0)
+  status      String   @default("ACTIVE") // "ACTIVE" or "DISABLED"
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, name])
+}
