@@ -22,7 +22,7 @@ WebHost 是一个基于 React + Express + Prisma 开发的轻量级静态网页�
 
 ### 1. 克隆项目
 ```bash
-git clone https://github.com/your-username/web2.git
+git https://github.com/nkiuhnd/Website-Hosting.git
 cd web2/Website-Hosting
 ```
 
