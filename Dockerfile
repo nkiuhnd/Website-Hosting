@@ -1,8 +1,11 @@
 # 使用 Node.js v20.19.4 的 Alpine 基础镜像
 FROM node:20.19.4-alpine AS base
 
+# 创建必要的目录结构
+RUN mkdir -p /app/server /app/client
+
 # 安装必要的系统依赖
-RUN apk add --no-cache bash git openssh-client curl
+RUN apk add --no-cache bash git openssh-client curl openssl
 
 # 第一阶段：构建客户端
 FROM base AS client-builder

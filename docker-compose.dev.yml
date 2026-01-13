@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  web-hosting-platform:
+    build:
+      context: .
+      target: base  # 使用基础镜像，不进行完整构建
+    ports:
+      - "4000:4000"
+      - "5173:5173"  # 用于客户端开发服务器
+    volumes:
+      - ./server:/app/server  # 挂载服务器代码
+      - ./client:/app/client  # 挂载客户端代码
+      - ./server/prisma/dev_v2.db:/app/server/prisma/dev_v2.db  # 挂载数据库文件
+    environment:
+      - NODE_ENV=development
+    working_dir: /app
+    command: bash -c "cd /app/server && npm install --registry=https://registry.npmmirror.com && npx prisma generate && npm run dev & sleep 2 && cd /app/client && npm install --registry=https://registry.npmmirror.com && npm run dev"
+    restart: on-failure

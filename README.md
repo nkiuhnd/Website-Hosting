@@ -22,8 +22,8 @@ WebHost 是一个基于 React + Express + Prisma 开发的轻量级静态网页�
 
 ### 1. 克隆项目
 ```bash
-git https://github.com/nkiuhnd/Website-Hosting.git
-cd web2/Website-Hosting
+git clone https://github.com/nkiuhnd/Website-Hosting.git
+cd Website-Hosting
 ```
 
 ### 2. 安装依赖
@@ -84,34 +84,84 @@ ADMIN_USERNAME="admin"
 ADMIN_PASSWORD="your_secure_password"
 ```
 
-### 3. 使用 Docker Compose 构建和启动服务
+### 3. Docker 启动方式
 
-**构建并启动服务：**
+#### 3.1 开发环境（支持代码热重载）
+
+开发环境支持代码热重载，无需每次更改代码都重新构建镜像。
+
+**启动开发环境：**
+```bash
+docker-compose -f docker-compose.dev.yml up --build
+```
+
+**特点：**
+- 挂载源代码目录到容器中，代码更改会自动触发热重载
+- 同时启动服务器和客户端的开发服务器
+- 服务器运行在端口 4000，客户端运行在端口 5173
+- 自动安装依赖并生成 Prisma 客户端
+
+**代码更改时：**
+由于源代码目录已经挂载到容器中，您只需要修改本地代码，更改会自动同步到容器中并触发热重载，无需重新构建镜像或重启容器。
+
+#### 3.2 生产环境（注重稳定性和性能）
+
+生产环境会进行完整的构建过程，包括客户端和服务器的构建。
+
+**启动生产环境：**
 ```bash
 docker-compose up --build -d
 ```
 
-- `--build`: 重新构建镜像
-- `-d`: 后台运行容器
+**特点：**
+- 使用多阶段构建来减小镜像大小
+- 只包含必要的生产环境依赖
+- 代码已经构建完成，运行速度更快
+- 以后台模式运行（使用 `-d` 参数）
 
-**查看运行状态：**
+**代码更改时：**
+当您修改代码后，需要重新构建镜像并启动容器：
 ```bash
-docker-compose ps
+docker-compose up --build -d
 ```
 
-**查看日志：**
+这个命令会：
+1. 重新构建镜像（使用最新的代码）
+2. 停止并删除旧容器
+3. 使用新镜像启动新容器
+
+### 4. 其他有用的 Docker 命令
+
+#### 停止容器：
 ```bash
+# 开发环境
+docker-compose -f docker-compose.dev.yml stop
+
+# 生产环境
+docker-compose stop
+```
+
+#### 查看日志：
+```bash
+# 开发环境
+docker-compose -f docker-compose.dev.yml logs -f
+
+# 生产环境
 docker-compose logs -f
 ```
 
-**停止服务：**
+#### 重启容器：
 ```bash
-docker-compose down
+# 开发环境
+docker-compose -f docker-compose.dev.yml restart
+
+# 生产环境
+docker-compose restart
 ```
 
-**重启服务：**
+#### 查看运行状态：
 ```bash
-docker-compose restart
+docker-compose ps
 ```
 
 ### 4. 访问应用
